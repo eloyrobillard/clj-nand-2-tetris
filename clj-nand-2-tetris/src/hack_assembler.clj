@@ -70,12 +70,10 @@
 
 (defn assemble [seq]
   (let [st (populate-symbol-table seq st)]
-    (let [res (-> seq
-                  rm-non-code
-                  rm-l-instr
-                  (assemble-aux st))]
-      (println st)
-      res)))
+    (-> seq
+        rm-non-code
+        rm-l-instr
+        (assemble-aux st))))
 
 ; (assemble '("" "// swer" "@456" "@123" "(echo)" "D=0" "0;JMP"))
 ; (assemble '("@456" "@123" "" "// wer" "(echo)" "D=0" "0;JMP"))
