@@ -30,6 +30,23 @@ clj -M <file/path>
 
 ## Postmortem
 
+### Clojureの独特な機能 Clojure's special features
+
+#### 契約プログラミング
+
+Clojure で [condition map](https://clojure.org/reference/special_forms#_fn_name_param_condition_map_expr) という機能を使い、
+関数の定義に引数・返り値に対する assert を組み込むができる。
+
+``` clojure
+(defn kelvin-to-celsius [K]
+  {:pre [(>= K 0)]     ; 負数のケルビンはありえない
+  :post [(float? %)]}  ; 返り値はかならず浮動小数点数になる
+  (+ K 273.15))
+```
+
+アサーションの利点の一つは、あとから単体テストでアサーションの内容を確認する必要をなくす。
+condition map により、引数・返り値の値に契約を課し、バグが起こりうる箇所を簡単に減らすことができる。
+
 ### Clojure/Javaにおける意味不明なエラー Cryptic errors in Clojure/Java
 
 #### `class <module>$<function>$sym__<number> cannot be cast to class java.lang.<Class>`
