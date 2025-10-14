@@ -49,6 +49,28 @@ condition map により、引数・返り値の値に契約を課し、バグが
 
 ### Clojure/Javaにおける意味不明なエラー Cryptic errors in Clojure/Java
 
+#### `No matching method write found taking 1 args for class java.io.BufferedWriter`
+
+"w.txt" に "true" を書き込みたく、以下のコードを書いたとしよう。
+
+``` clojure
+(with-open [w (clojure.java.io/writer "w.txt")]
+  (.write w true))
+```
+
+このコードを実行すると次の例外が投げられる：
+
+```
+Execution error (IllegalArgumentException) at user/eval8965 (REPL:1).
+No matching method write found taking 1 args for class java.io.BufferedWriter
+```
+
+この例外によれば、`java.io.BufferedWriter`である`w`に`write`メソッドがないというような内容に聞こえる。
+
+だが、実は大事なのは１行目の`IllegalArgumentException`であり、本当のエラーを示す。
+
+*すなわち、`BufferedWriter`の`write`にブールを渡すのは間違いだということ。*
+
 #### `class <module>$<function>$sym__<number> cannot be cast to class java.lang.<Class>`
 
 このエラーは下記のコードで連発していた：
