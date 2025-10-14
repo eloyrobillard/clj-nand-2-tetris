@@ -1,5 +1,7 @@
 # Clojure Hack Assembler
 
+[NAND2TETRIS](https://www.nand2tetris.org/) コースに登場する アセンブリから Hack 機械語へのアセンブラー。
+
 ## Getting Started
 
 ### Using Neovim/Conjure
@@ -28,7 +30,7 @@ Run a file using (`-M` stands for main):
 clj -M <file/path>
 ```
 
-## Postmortem
+## 備忘録
 
 ### Clojureの独特な機能 Clojure's special features
 
