@@ -4,6 +4,8 @@
 
 ### Using Neovim/Conjure
 
+Install `clj` and Clojure: [official instructions](https://clojure.org/guides/install_clojure).
+
 Start a REPL:
 
 ``` bash
