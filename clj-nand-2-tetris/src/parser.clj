@@ -37,6 +37,7 @@
   (parts 2))
 
 (defn parse [line]
+  {:pre [(string? line)]}
   (let [parts (str/split line #" ")
         type (command-type (parts 0))]))
 
