@@ -18,7 +18,8 @@
     "lt" :c-arithm
     "and" :c-arithm
     "or" :c-arithm
-    "not" :c-arithm))
+    "not" :c-arithm
+    :else :c-bad-type))
 
 (defn arg1 [parts type]
   {:pre [(not (= type :c-return))]
