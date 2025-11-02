@@ -23,12 +23,17 @@
 (defn arg1 [parts type]
   {:pre [(not (= type :c-return))]
    :post [(some? %)]}
-  (parts 0))
+  (if (= type :c-arithm)
+    (parts 0)
+    (parts 1)))
+
+(arg1 ["add" "5"] :c-arithm)
+(arg1 ["push" "constant" "9"] :c-push)
 
 (defn arg2 [parts type]
   {:pre [(some #(= type %) [:c-push, :c-pop, :c-function, :c-call])]
    :post [(some? %)]}
-  (parts 1))
+  (parts 2))
 
 (defn parse [line]
   (let [parts (str/split line #" ")
