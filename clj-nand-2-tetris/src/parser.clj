@@ -39,5 +39,10 @@
 (defn parse [line]
   {:pre [(string? line)]}
   (let [parts (str/split line #" ")
-        type (command-type (parts 0))]))
+        type (command-type (parts 0))
+        a1 (arg1 parts type)]
+    (if (some #(= type %) [:c-push, :c-pop, :c-function, :c-call])
+      (let [a2 (arg2 parts type)]
+        {:type type :a1 a1 :a2 a2})
+      {:type type :a1 a1 :a2 nil})))
 
