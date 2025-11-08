@@ -17,6 +17,15 @@
 
 ; (run "Foo" '("push argument 1" "add" "neg"))
 
+(defn sanitize-lines [lines]
+  (remove
+   #(or
+     (str/blank? %)
+     (str/starts-with? (str/triml %) "//"))
+   lines))
+
 (let [filename (first *command-line-args*)]
   (with-open [r (clojure.java.io/reader filename)]
-    (run filename (into [] (line-seq r)))))
+    (let [lines (sanitize-lines (into [] (line-seq r)))]
+      (run filename
+           lines))))
