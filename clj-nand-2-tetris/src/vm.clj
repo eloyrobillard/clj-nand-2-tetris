@@ -26,8 +26,11 @@
      (str/starts-with? (str/triml %) "//"))
    lines))
 
+(def regs-setup ["// set SP up" "@256" "D=A" "@SP" "M=D"])
+
 (let [filename (first *command-line-args*)]
   (with-open [r (clojure.java.io/reader filename)]
     (let [lines (sanitize-lines (into [] (line-seq r)))]
+      (print-sequence regs-setup)
       (run filename
            lines 0))))
