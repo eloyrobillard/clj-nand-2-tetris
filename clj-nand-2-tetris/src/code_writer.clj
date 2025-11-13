@@ -38,22 +38,40 @@
                  :else [address "D=M" push-to-stack]))
       (flatten [popd "@TEMP" "M=D" address "M=D"]))))
 
-(defn arithm [op]
-  (match op
-    "neg" "-D"
-    "not" "!D"
-    "add" "D+M"
-    "sub" "D-M"))
+(defn setup-boolean-op [filename op]
+  (let [suffix (str/upper-case (:a1 op))]
+    ["D=D-M"
+     (str/join "" ["@" filename "." suffix "." (:ln op)])
+     (str/join "" ["D;J" suffix])
+     "D=0"
+     (str/join "" ["@N" filename "." suffix "." (:ln op)])
+     "0;JMP"
+     (str/join "" ["(" filename "." suffix "." (:ln op) ")"])
+     "D=-1"
+     (str/join "" ["(N" filename "." suffix "." (:ln op) ")"])]))
 
-(defn write-arithmetic [op]
+(defn arithm [filename op]
+  (match (:a1 op)
+         ; TODO:
+    "eq" (setup-boolean-op filename op)
+    "lt" (setup-boolean-op filename op)
+    "gt" (setup-boolean-op filename op)
+    "and" "D=D&M"
+    "or" "D=D|M"
+    "neg" "D=-D"
+    "not" "D=!D"
+    "add" "D=D+M"
+    "sub" "D=D-M"))
+
+(defn write-arithmetic [filename op]
   (let [a1 (:a1 op)]
     (if (or (= a1 "neg") (= a1 "not"))
-      (flatten [popd (str/join "" ["D=" (arithm a1)]) push-to-stack])
-      (flatten [popd "@TEMP" "M=D" popd "@TEMP" (str/join "" ["D=" (arithm a1)]) push-to-stack]))))
+      (flatten [popd (arithm filename op) push-to-stack])
+      (flatten [popd "@TEMP" "M=D" popd "@TEMP" (arithm filename op) push-to-stack]))))
 
 (defn write [filename op]
   (let [type (:type op)]
     (match type
-      :c-arithm (write-arithmetic op)
+      :c-arithm (write-arithmetic filename op)
       :else (write-push-pop filename op))))
 
