@@ -52,7 +52,6 @@
 
 (defn arithm [filename op]
   (match (:a1 op)
-         ; TODO:
     "eq" (setup-boolean-op filename op)
     "lt" (setup-boolean-op filename op)
     "gt" (setup-boolean-op filename op)

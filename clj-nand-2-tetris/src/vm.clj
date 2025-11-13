@@ -4,15 +4,17 @@
   (:require [clojure.string :as str])
   (:require [parser]))
 
+(defn print-sequence [seq]
+  (when (some? (first seq))
+    (println (first seq))
+    (recur (rest seq))))
+
 (defn run [filename lines line-num]
   (if (nil? (first lines))
     nil
     (do
       (println (str/join " " ["//" (first lines)]))
-      (loop [asms (code-writer/write filename (parser/parse (first lines) line-num))]
-        (when (some? (first asms))
-          (println (first asms))
-          (recur (rest asms))))
+      (print-sequence (code-writer/write filename (parser/parse (first lines) line-num)))
       (run filename (rest lines) (+ line-num 1)))))
 
 ; (run "Foo" '("push argument 1" "add" "neg"))
