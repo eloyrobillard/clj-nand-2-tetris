@@ -7,15 +7,15 @@
 
 (defn get-address [filename segment offset]
   {:pre [(string? filename) (string? segment) (string? offset)]
-   :post [(sequential? %)]}
+   :post [(or (sequential? %) (string? %))]}
   (match segment
-    "constant" [(str/join "" ["@" offset])]
-    "static" [(str/join "." [(str/join "" ["@" filename]) offset]) "A=M"]
+    "constant" (str/join "" ["@" offset])
+    "static" [(str/join "" ["@" filename "." offset]) "A=M"]
     "local" (get-value-with-offset "@LCL" offset)
     "argument" (get-value-with-offset "@ARG" offset)
     "this" (get-value-with-offset "@THIS" offset)
     "that" (get-value-with-offset "@THAT" offset)
-    "temp" (get-value-with-offset "@TEMP" offset)
+    "temp" (str/join "" ["@" (+ 5 (Integer/parseInt offset))])
     "pointer" (if
                (= offset 0)
                 (get-value-with-offset "@THIS" offset)
@@ -36,7 +36,9 @@
       (flatten (match a1
                  "constant" [address "D=A" push-to-stack]
                  :else [address "D=M" push-to-stack]))
-      (flatten [popd "@TEMP" "M=D" address "M=D"]))))
+      (if (= a1 "temp")
+        (flatten [popd address "M=D"])
+        (flatten [popd "@TEMP" "M=D" address "D=A" "@TEMP" "A=A+1" "M=D" "@TEMP" "D=M" "A=A+1" "A=M" "M=D"])))))
 
 (defn setup-boolean-op [filename op]
   (let [suffix (str/upper-case (:a1 op))]
