@@ -17,8 +17,6 @@
       (print-sequence (code-writer/write filename (parser/parse (first lines) line-num)))
       (run filename (rest lines) (+ line-num 1)))))
 
-; (run "Foo" '("push argument 1" "add" "neg"))
-
 (defn sanitize-lines [lines]
   (remove
    #(or
@@ -31,6 +29,5 @@
 (let [filename (first *command-line-args*)]
   (with-open [r (clojure.java.io/reader filename)]
     (let [lines (sanitize-lines (into [] (line-seq r)))]
-      (print-sequence regs-setup)
       (run filename
            lines 0))))

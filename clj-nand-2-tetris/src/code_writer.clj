@@ -21,10 +21,6 @@
                 "@THIS"
                 "@THAT")))
 
-; (get-address "Foo" "static" "8")
-; (get-address "Foo" "constant" "8")
-; (get-address "Foo" "local" "8")
-
 (def push-to-stack ["@SP" "A=M" "M=D" "@SP" "M=M+1"])
 (def popd ["@SP" "M=M-1" "A=M" "D=M"])
 (defn write-push-pop [filename op]

@@ -28,9 +28,6 @@
     (parts 0)
     (parts 1)))
 
-; (arg1 ["add" "5"] :c-arithm)
-; (arg1 ["push" "constant" "9"] :c-push)
-
 (defn arg2 [parts type]
   {:pre [(some #(= type %) [:c-push, :c-pop, :c-function, :c-call])]
    :post [(some? %)]}
