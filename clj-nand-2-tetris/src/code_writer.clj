@@ -10,7 +10,7 @@
    :post [(or (sequential? %) (string? %))]}
   (match segment
     "constant" (str/join "" ["@" offset])
-    "static" [(str/join "" ["@" filename "." offset]) "A=M"]
+    "static" (str/join "" ["@" filename "." offset])
     "local" (get-value-with-offset "@LCL" offset)
     "argument" (get-value-with-offset "@ARG" offset)
     "this" (get-value-with-offset "@THIS" offset)
@@ -66,8 +66,9 @@
       (flatten [popd (arithm filename op) push-to-stack])
       (flatten [popd "@5" "M=D" popd "@5" (arithm filename op) push-to-stack]))))
 
-(defn write [filename op]
-  (let [type (:type op)]
+(defn write [filn op]
+  (let [type (:type op)
+        filename (str/replace filn #"\..*" "")]
     (match type
       :c-arithm (write-arithmetic filename op)
       :else (write-push-pop filename op))))
