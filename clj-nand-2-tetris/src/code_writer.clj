@@ -34,7 +34,7 @@
                  :else [address "D=M" push-to-stack]))
       (if (= a1 "temp")
         (flatten [popd address "M=D"])
-        (flatten [popd "@TEMP" "M=D" address "D=A" "@TEMP" "A=A+1" "M=D" "@TEMP" "D=M" "A=A+1" "A=M" "M=D"])))))
+        (flatten [popd "@5" "M=D" address "D=A" "@5" "A=A+1" "M=D" "@5" "D=M" "A=A+1" "A=M" "M=D"])))))
 
 (defn setup-boolean-op [filename op]
   (let [suffix (str/upper-case (:a1 op))]
@@ -64,7 +64,7 @@
   (let [a1 (:a1 op)]
     (if (or (= a1 "neg") (= a1 "not"))
       (flatten [popd (arithm filename op) push-to-stack])
-      (flatten [popd "@TEMP" "M=D" popd "@TEMP" (arithm filename op) push-to-stack]))))
+      (flatten [popd "@5" "M=D" popd "@5" (arithm filename op) push-to-stack]))))
 
 (defn write [filename op]
   (let [type (:type op)]
