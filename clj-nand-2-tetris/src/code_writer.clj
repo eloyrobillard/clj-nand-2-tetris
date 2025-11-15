@@ -17,9 +17,9 @@
     "that" (get-value-with-offset "@THAT" offset)
     "temp" (str/join "" ["@" (+ 5 (Integer/parseInt offset))])
     "pointer" (if
-               (= offset 0)
-                (get-value-with-offset "@THIS" offset)
-                (get-value-with-offset "@THAT" offset))))
+               (= offset "0")
+                "@THIS"
+                "@THAT")))
 
 ; (get-address "Foo" "static" "8")
 ; (get-address "Foo" "constant" "8")
