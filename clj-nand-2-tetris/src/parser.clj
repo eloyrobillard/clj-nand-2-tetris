@@ -8,6 +8,12 @@
 
 (defn command-type [op]
   (match op
+    "label" :c-label
+    "goto" :c-goto
+    "if-goto" :c-if
+    "function" :c-function
+    "return" :c-return
+    "call" :c-call
     "push" :c-push
     "pop" :c-pop
     "add" :c-arithm
