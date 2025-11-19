@@ -28,13 +28,13 @@
         a1 (:a1 op)
         a2 (:a2 op)
         address (get-address filename a1 a2)]
-    (if (= type :c-push)
-      (flatten (match a1
-                 "constant" [address "D=A" push-to-stack]
-                 :else [address "D=M" push-to-stack]))
-      (if (= a1 "temp")
-        (flatten [popd address "M=D"])
-        (flatten [popd "@5" "M=D" address "D=A" "@5" "A=A+1" "M=D" "@5" "D=M" "A=A+1" "A=M" "M=D"])))))
+    (match type
+      :c-push (flatten (match a1
+                         "constant" [address "D=A" push-to-stack]
+                         :else [address "D=M" push-to-stack]))
+      :c-pop (if (= a1 "temp")
+               (flatten [popd address "M=D"])
+               (flatten [popd "@5" "M=D" address "D=A" "@5" "A=A+1" "M=D" "@5" "D=M" "A=A+1" "A=M" "M=D"])))))
 
 (defn setup-boolean-op [filename op]
   (let [suffix (str/upper-case (:a1 op))]
@@ -71,5 +71,6 @@
         filename (str/replace filn #"\..*" "")]
     (match type
       :c-arithm (write-arithmetic filename op)
-      :else (write-push-pop filename op))))
+      :c-push (write-push-pop filename op)
+      :c-pop (write-push-pop filename op))))
 
