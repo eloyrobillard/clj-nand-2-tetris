@@ -2,10 +2,6 @@
   (:require [clojure.core.match :refer [match]])
   (:require [clojure.string :as str]))
 
-; push segment index
-; pop segment index
-; no args: add, sub, neg, eq, gt, lt, and, or, not
-
 (defn command-type [op]
   (match op
     "label" :c-label

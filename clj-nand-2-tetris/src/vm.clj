@@ -18,11 +18,11 @@
       (run filename (rest lines) (+ line-num 1)))))
 
 (defn sanitize-lines [lines]
-  (remove
-   #(or
-     (str/blank? %)
-     (str/starts-with? (str/triml %) "//"))
-   lines))
+  (map str/triml (remove
+                  #(or
+                    (str/blank? %)
+                    (str/starts-with? (str/triml %) "//"))
+                  lines)))
 
 (def regs-setup ["// set SP up" "@256" "D=A" "@SP" "M=D"])
 
