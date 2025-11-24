@@ -3,19 +3,19 @@
   (:require [clojure.core.match :refer [match]]))
 
 (defn get-value-with-offset [base offset]
-  [base "D=M" (str/join "" ["@" offset]) "A=D+A"])
+  [base "D=M" (str/join ["@" offset]) "A=D+A"])
 
 (defn get-address [filename segment offset]
   {:pre [(string? filename) (string? segment) (string? offset)]
    :post [(or (sequential? %) (string? %))]}
   (match segment
-    "constant" (str/join "" ["@" offset])
-    "static" (str/join "" ["@" filename "." offset])
+    "constant" (str/join ["@" offset])
+    "static" (str/join ["@" filename "." offset])
     "local" (get-value-with-offset "@LCL" offset)
     "argument" (get-value-with-offset "@ARG" offset)
     "this" (get-value-with-offset "@THIS" offset)
     "that" (get-value-with-offset "@THAT" offset)
-    "temp" (str/join "" ["@" (+ 5 (Integer/parseInt offset))])
+    "temp" (str/join ["@" (+ 5 (Integer/parseInt offset))])
     "pointer" (if
                (= offset "0")
                 "@THIS"
@@ -39,14 +39,14 @@
 (defn setup-boolean-op [filename op]
   (let [suffix (str/upper-case (:a1 op))]
     ["D=D-M"
-     (str/join "" ["@" filename "." suffix "." (:ln op)])
-     (str/join "" ["D;J" suffix])
+     (str/join ["@" filename "." suffix "." (:ln op)])
+     (str/join ["D;J" suffix])
      "D=0"
-     (str/join "" ["@N" filename "." suffix "." (:ln op)])
+     (str/join ["@N" filename "." suffix "." (:ln op)])
      "0;JMP"
-     (str/join "" ["(" filename "." suffix "." (:ln op) ")"])
+     (str/join ["(" filename "." suffix "." (:ln op) ")"])
      "D=-1"
-     (str/join "" ["(N" filename "." suffix "." (:ln op) ")"])]))
+     (str/join ["(N" filename "." suffix "." (:ln op) ")"])]))
 
 (defn arithm [filename op]
   (match (:a1 op)
@@ -68,15 +68,15 @@
 
 (defn write-label [op]
   (let [label (:a1 op)]
-    [(str/join "" ["(" label ")"])]))
+    [(str/join ["(" label ")"])]))
 
 (defn write-goto [op]
   (let [label (:a1 op)]
-    [(str/join "" ["@" label]) "0;JMP"]))
+    [(str/join ["@" label]) "0;JMP"]))
 
 (defn write-if [op]
   (let [label (:a1 op)]
-    (flatten [popd (str/join "" ["@" label]) "D;JNE"])))
+    (flatten [popd (str/join ["@" label]) "D;JNE"])))
 
 (defn write [filn op]
   (let [type (:type op)
