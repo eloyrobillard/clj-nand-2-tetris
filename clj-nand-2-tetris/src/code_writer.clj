@@ -66,10 +66,25 @@
       (flatten [popd (arithm filename op) push-to-stack])
       (flatten [popd "@5" "M=D" popd "@5" (arithm filename op) push-to-stack]))))
 
+(defn write-label [op]
+  (let [label (:a1 op)]
+    [(str/join "" ["(" label ")"])]))
+
+(defn write-goto [op]
+  (let [label (:a1 op)]
+    [(str/join "" ["@" label]) "0;JMP"]))
+
+(defn write-if [op]
+  (let [label (:a1 op)]
+    (flatten [popd (str/join "" ["@" label]) "D;JNE"])))
+
 (defn write [filn op]
   (let [type (:type op)
         filename (str/replace filn #"\..*" "")]
     (match type
+      :c-label (write-label op)
+      :c-goto (write-goto op)
+      :c-if (write-if op)
       :c-arithm (write-arithmetic filename op)
       :c-push (write-push-pop filename op)
       :c-pop (write-push-pop filename op))))
