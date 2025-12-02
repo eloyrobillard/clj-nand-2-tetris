@@ -9,13 +9,16 @@
     (println (first seq))
     (recur (rest seq))))
 
-(defn run [filename lines line-num]
+(defn run [filename funcname lines line-num]
   (if (nil? (first lines))
     nil
     (do
       (println (str/join " " ["//" (first lines)]))
-      (print-sequence (code-writer/write filename (parser/parse (first lines) line-num)))
-      (run filename (rest lines) (+ line-num 1)))))
+      (let [res (code-writer/write filename funcname (parser/parse (first lines) line-num))
+            fname (:fname res)
+            asm (:asm res)]
+        (print-sequence asm)
+        (run filename fname (rest lines) (+ line-num 1))))))
 
 (defn sanitize-lines [lines]
   (map str/triml (remove
@@ -26,8 +29,12 @@
 
 (def regs-setup ["// set SP up" "@256" "D=A" "@SP" "M=D"])
 
+(defn sanitize-filename [filename]
+  (str/replace filename #"\..*" ""))
+
 (let [filename (first *command-line-args*)]
   (with-open [r (clojure.java.io/reader filename)]
     (let [lines (sanitize-lines (into [] (line-seq r)))]
-      (run filename
+      (run (sanitize-filename filename)
+           "Sys.init"
            lines 0))))

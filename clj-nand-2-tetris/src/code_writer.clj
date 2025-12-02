@@ -23,6 +23,11 @@
 
 (def push-to-stack ["@SP" "A=M" "M=D" "@SP" "M=M+1"])
 (def popd ["@SP" "M=M-1" "A=M" "D=M"])
+
+(defn push-constant [const]
+  {:pre [(string? const)]}
+  [const "D=A" push-to-stack])
+
 (defn write-push-pop [filename op]
   (let [type (:type op)
         a1 (:a1 op)
@@ -30,7 +35,7 @@
         address (get-address filename a1 a2)]
     (match type
       :c-push (flatten (match a1
-                         "constant" [address "D=A" push-to-stack]
+                         "constant" push-constant
                          :else [address "D=M" push-to-stack]))
       :c-pop (if (= a1 "temp")
                (flatten [popd address "M=D"])
@@ -66,26 +71,31 @@
       (flatten [popd (arithm filename op) push-to-stack])
       (flatten [popd "@5" "M=D" popd "@5" (arithm filename op) push-to-stack]))))
 
-(defn write-label [op]
+(defn write-label [filename fname op]
   (let [label (:a1 op)]
-    [(str/join ["(" label ")"])]))
+    [(str/join ["(" filename "." fname "$" label ")"])]))
 
-(defn write-goto [op]
+(defn write-goto [filename fname op]
   (let [label (:a1 op)]
-    [(str/join ["@" label]) "0;JMP"]))
+    [(str/join ["@" filename "." fname "$" label]) "0;JMP"]))
 
-(defn write-if [op]
+(defn write-if [filename fname op]
   (let [label (:a1 op)]
-    (flatten [popd (str/join ["@" label]) "D;JNE"])))
+    (flatten [popd (str/join ["@" filename "." fname "$" label]) "D;JNE"])))
 
-(defn write [filn op]
-  (let [type (:type op)
-        filename (str/replace filn #"\..*" "")]
-    (match type
-      :c-label (write-label op)
-      :c-goto (write-goto op)
-      :c-if (write-if op)
-      :c-arithm (write-arithmetic filename op)
-      :c-push (write-push-pop filename op)
-      :c-pop (write-push-pop filename op))))
+(defn write-function [op]
+  {:pre [(some? (:a2 op))]}
+  [(str "(" (:a1 op) ")") (repeat (Integer/parseInt (:a2 op)) (push-constant "0"))])
+
+(defn write [filename fname op]
+  (let [type (:type op)]
+    {:fname (if (= :c-function (:type op)) (:a1 op) fname)
+     :asm (match type
+            :c-function (write-function op)
+            :c-label (write-label filename fname op)
+            :c-goto (write-goto filename fname op)
+            :c-if (write-if filename fname op)
+            :c-arithm (write-arithmetic filename op)
+            :c-push (write-push-pop filename op)
+            :c-pop (write-push-pop filename op))}))
 
