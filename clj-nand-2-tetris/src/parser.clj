@@ -24,11 +24,10 @@
     :else :c-bad-type))
 
 (defn arg1 [parts type]
-  {:pre [(not (= type :c-return))]
-   :post [(some? %)]}
-  (if (= type :c-arithm)
-    (parts 0)
-    (parts 1)))
+  (match type
+    :c-return nil
+    :c-arithm (parts 0)
+    :else (parts 1)))
 
 (defn arg2 [parts type]
   {:pre [(some #(= type %) [:c-push, :c-pop, :c-function, :c-call])]

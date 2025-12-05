@@ -9,16 +9,17 @@
     (println (first seq))
     (recur (rest seq))))
 
-(defn run [filename funcname lines line-num]
+(defn run [filename funcname call-num lines line-num]
   (if (nil? (first lines))
     nil
     (do
       (println (str/join " " ["//" (first lines)]))
-      (let [res (code-writer/write filename funcname (parser/parse (first lines) line-num))
+      (let [res (code-writer/write filename funcname 0 (parser/parse (first lines) line-num))
             fname (:fname res)
+            call-num (:call-num res)
             asm (:asm res)]
         (print-sequence asm)
-        (run filename fname (rest lines) (+ line-num 1))))))
+        (run filename fname call-num (rest lines) (+ line-num 1))))))
 
 (defn sanitize-lines [lines]
   (map str/triml (remove
@@ -37,4 +38,5 @@
     (let [lines (sanitize-lines (into [] (line-seq r)))]
       (run (sanitize-filename filename)
            "Sys.init"
+           0
            lines 0))))
