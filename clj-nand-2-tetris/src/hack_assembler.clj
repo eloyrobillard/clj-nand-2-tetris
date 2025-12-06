@@ -105,4 +105,3 @@
 (let [fin (with-open [rdr (clojure.java.io/reader (first *command-line-args*))]
             (into [] (line-seq rdr)))]
   (spit "test.hack" (str/join "\n" (assemble fin))))
-    ; (run! (.write w) (map str (assemble fin)))))
