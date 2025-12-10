@@ -31,8 +31,12 @@
 (defn pop-direct-address [address]
   (flatten [pop-d address "M=D"]))
 
+(defn pop-temp [offset]
+  {:pre [(int? offset)]}
+  (flatten [pop-d (str "@" (+ offset 5)) "M=D"]))
+
 (defn pop-indirect-address [address]
-  (flatten [pop-d "@5" "M=D" address "D=A" "@6" "M=D" "@5" "D=M" "@6" "A=M" "M=D"]))
+  (flatten [(pop-temp 0) address "D=A" "@6" "M=D" "@5" "D=M" "@6" "A=M" "M=D"]))
 
 (defn write-push-pop [filename op]
   (let [type (:type op)
@@ -96,17 +100,35 @@
 (defn var-to-var [v1 v2]
   [(str "@" v1) "D=M" (str "@" v2) "M=D"])
 
+(defn assign [r l]
+  (flatten [l r "M=D"]))
+
+(defn subtract-const [var const]
+  (flatten [var const "D=D-A"]))
+
+(defn add-const [var const]
+  (flatten [var const "D=D+A"]))
+
+(defn get-var [segment]
+  [segment "D=M"])
+
+(defn goto [dest]
+  (flatten [dest "0;JMP"]))
+
+(defn dref [ref]
+  (flatten [ref "A=D" "D=M"]))
+
 (defn write-return [filename]
   (flatten
-   ["@LCL" "D=M" ; frame = LCL
-    "@5" "D=D-A" "A=D" "D=M" "@retAddr" "M=D" ; retAddr = *(frame-5)
+   [; frame = LCL
+    (assign "@retAddr" (dref (subtract-const (get-var "LCL") "5"))) ; retAddr = *(frame-5)
     (write-push-pop filename {:type :c-pop :a1 "argument" :a2 "0"}); *ARG = pop()
-    "@ARG" "D=M" "D=D+1" "@SP" "M=D"; SP = ARG + 1
-    "@LCL" "D=M" "D=D-1" "@THAT" "M=D" ; THAT = *(frame-1)
-    "@LCL" "D=M" "@2" "D=D-A" "@THIS" "M=D" ; THIS = *(frame-2)
-    "@LCL" "D=M" "@3" "D=D-A" "@ARG" "M=D" ; ARG = *(frame-3)
-    "@LCL" "D=M" "@4" "D=D-A" "@LCL" "M=D" ; LCL = *(frame-4)
-    "@retAddr" "0;JMP" ; goto retAddr
+    (assign "@SP" (dref (add-const (get-var "ARG") "1"))) ; SP = ARG + 1
+    (assign "@THAT" (dref (subtract-const (get-var "LCL") "1"))) ; THAT = *(frame-1)
+    (assign "@THIS" (dref (subtract-const (get-var "LCL") "2"))) ; THIS = *(frame-2)
+    (assign "@ARG" (dref (subtract-const (get-var "LCL") "3"))) ; ARG = *(frame-3)
+    (assign "@LCL" (dref (subtract-const (get-var "LCL") "4"))) ; LCL = *(frame-4)
+    (goto "@retAddr") ; goto retAddr
     ]))
 
 (defn push-segment [segment] [(str "@" segment) "D=M" push-d])
