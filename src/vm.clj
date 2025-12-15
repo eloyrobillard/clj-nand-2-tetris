@@ -27,7 +27,9 @@
 (def regs-setup ["// set SP up" "@256" "D=A" "@SP" "M=D"])
 
 (defn sanitize-filename [filename]
-  (str/replace filename #"\..*" ""))
+  (-> filename
+      (str/replace #"\..*" "")
+      (str/replace #".+\/" "")))
 
 (let [filename (first *command-line-args*)]
   (with-open [r (clojure.java.io/reader filename)]
