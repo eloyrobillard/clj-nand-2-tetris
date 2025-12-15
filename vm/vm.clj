@@ -1,13 +1,9 @@
 (ns vm
   (:require [clojure.java.io])
   (:require [clojure.string :as str])
+  (:require [utils])
   (:require [vm.code-writer :as cw])
   (:require [vm.parser :as p]))
-
-(defn print-sequence [seq]
-  (when (some? (first seq))
-    (println (first seq))
-    (recur (rest seq))))
 
 (defn run [filename funcname call-num lines line-num]
   (if (nil? (first lines))
@@ -18,7 +14,7 @@
             fname (:fname res)
             call-num (:call-num res)
             asm (:asm res)]
-        (print-sequence asm)
+        (utils/print-sequence asm)
         (run filename fname call-num (rest lines) (+ line-num 1))))))
 
 (defn sanitize-lines [lines]
