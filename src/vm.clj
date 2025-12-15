@@ -5,7 +5,7 @@
   (:require [vm.code-writer :as cw])
   (:require [vm.parser :as p]))
 
-(defn run [filename funcname call-num lines line-num]
+(defn run [filename funcname call-num line-num lines]
   (if (nil? (first lines))
     nil
     (do
@@ -15,7 +15,7 @@
             call-num (:call-num res)
             asm (:asm res)]
         (utils/print-sequence asm)
-        (run filename fname call-num (rest lines) (+ line-num 1))))))
+        (run filename fname call-num (+ line-num 1) (rest lines))))))
 
 (defn sanitize-lines [lines]
   (map str/triml (remove
@@ -38,4 +38,5 @@
       (run (sanitize-filename filename)
            ""
            0
-           lines 0))))
+           0
+           lines))))
