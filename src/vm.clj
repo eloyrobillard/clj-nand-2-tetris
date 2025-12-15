@@ -36,6 +36,6 @@
     (let [lines (sanitize-lines (into [] (line-seq r)))]
       (utils/print-sequence sp-setup)
       (run (sanitize-filename filename)
-           "Sys.init"
+           ""
            0
            lines 0))))
