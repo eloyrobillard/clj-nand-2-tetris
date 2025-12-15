@@ -10,7 +10,7 @@
     nil
     (do
       (println (str/join " " ["//" (first lines)]))
-      (let [res (cw/write filename funcname 0 (p/parse (first lines) line-num))
+      (let [res (cw/write filename funcname call-num (p/parse (first lines) line-num))
             fname (:fname res)
             call-num (:call-num res)
             asm (:asm res)]
