@@ -2,9 +2,9 @@
   (:require [clojure.java.io :as io])
   (:require [clojure.string :as str])
   (:require [clojure.math :as math])
-  (:require [symbol-table :as st])
-  (:require [parser :as p])
-  (:require [clojure.core.match :refer [match]]))
+  (:require [clojure.core.match :refer [match]])
+  (:require [assembler.symbol-table :as st])
+  (:require [assembler.parser :as p]))
 
 (defn rm-non-code [seq]
   (filter #(not (or (p/is-ws? %) (p/is-cmt? %))) seq))

@@ -1,9 +1,9 @@
 (ns hack-assembler
   (:require [clojure.java.io :as io])
   (:require [clojure.string :as str])
-  (:require [symbol-table :as st])
-  (:require [code :as c])
-  (:require [parser :as p]))
+  (:require [assembler.symbol-table :as st])
+  (:require [assembler.code :as c])
+  (:require [assembler.parser :as p]))
 
 (defn rm-non-code [seq]
   (filter #(not (or (p/is-ws? %) (p/is-cmt? %))) seq))

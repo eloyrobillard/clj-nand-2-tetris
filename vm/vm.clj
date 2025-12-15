@@ -1,8 +1,8 @@
 (ns vm
   (:require [clojure.java.io])
-  (:require [code-writer])
   (:require [clojure.string :as str])
-  (:require [vm.parser :as parser]))
+  (:require [vm.code-writer :as cw])
+  (:require [vm.parser :as p]))
 
 (defn print-sequence [seq]
   (when (some? (first seq))
@@ -14,7 +14,7 @@
     nil
     (do
       (println (str/join " " ["//" (first lines)]))
-      (let [res (code-writer/write filename funcname 0 (parser/parse (first lines) line-num))
+      (let [res (cw/write filename funcname 0 (p/parse (first lines) line-num))
             fname (:fname res)
             call-num (:call-num res)
             asm (:asm res)]
