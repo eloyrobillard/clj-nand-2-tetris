@@ -104,13 +104,13 @@
   (flatten [l r "M=D"]))
 
 (defn subtract-const [var const]
-  (flatten [var const "D=D-A"]))
+  (flatten [var (str "@" const) "D=D-A"]))
 
 (defn add-const [var const]
   (flatten [var const "D=D+A"]))
 
 (defn get-var [segment]
-  [segment "D=M"])
+  [(str "@" segment) "D=M"])
 
 (defn goto [dest]
   (flatten [dest "0;JMP"]))
