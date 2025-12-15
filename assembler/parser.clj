@@ -1,6 +1,4 @@
-(ns parser
-  (:require [symbol-table :as st])
-  (:require [clojure.pprint :as pp])
+(ns assembler.parser
   (:require [clojure.string :as str]))
 
 (defn is-a? [instr] (str/starts-with? (str/triml instr) "@"))

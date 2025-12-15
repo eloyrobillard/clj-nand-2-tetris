@@ -1,4 +1,4 @@
-(ns parser
+(ns vm.parser
   (:require [clojure.core.match :refer [match]])
   (:require [clojure.string :as str]))
 

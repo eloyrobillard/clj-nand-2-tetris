@@ -1,4 +1,4 @@
-(ns symbol-table)
+(ns assembler.symbol-table)
 
 (defn add-entry [st key val]
   {:pre [(map? st) (string? key) (int? val)]}

@@ -2,7 +2,7 @@
   (:require [clojure.java.io])
   (:require [code-writer])
   (:require [clojure.string :as str])
-  (:require [parser]))
+  (:require [vm.parser :as parser]))
 
 (defn print-sequence [seq]
   (when (some? (first seq))

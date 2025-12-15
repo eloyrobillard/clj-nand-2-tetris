@@ -1,4 +1,4 @@
-(ns code
+(ns assembler.code
   (:require [clojure.core.match :refer [match]]))
 
 (defn dest [in]

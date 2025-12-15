@@ -1,4 +1,4 @@
-(ns code-writer
+(ns vm.code-writer
   (:require [clojure.string :as str])
   (:require [clojure.core.match :refer [match]]))
 
