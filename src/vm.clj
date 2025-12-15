@@ -24,7 +24,7 @@
                     (str/starts-with? (str/triml %) "//"))
                   lines)))
 
-(def regs-setup ["// set SP up" "@256" "D=A" "@SP" "M=D"])
+(def sp-setup ["// set SP up" "@256" "D=A" "@SP" "M=D"])
 
 (defn sanitize-filename [filename]
   (-> filename
@@ -34,6 +34,7 @@
 (let [filename (first *command-line-args*)]
   (with-open [r (clojure.java.io/reader filename)]
     (let [lines (sanitize-lines (into [] (line-seq r)))]
+      (utils/print-sequence sp-setup)
       (run (sanitize-filename filename)
            "Sys.init"
            0
