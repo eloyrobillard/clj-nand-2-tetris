@@ -128,7 +128,7 @@
   {:pre [(map? st)]
    :post [(every? string? %)]}
   (let [pc (:PC state)
-        instr (get seq pc)
+        instr (nth seq pc)
         type (p/instruction-type instr)]
     (if (= type :a-instr)
       (let [sym (p/sym instr :a-instr)]
