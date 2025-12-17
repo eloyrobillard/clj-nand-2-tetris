@@ -120,16 +120,23 @@
 
 (defn write-return [filename]
   (flatten
-   [; frame = LCL
-    (assign "@retAddr" (dref (subtract-const (get-var "LCL") "5"))) ; retAddr = *(frame-5)
-    (write-push-pop filename {:type :c-pop :a1 "argument" :a2 "0"}); *ARG = pop()
-    (assign "@SP" (dref (add-const (get-var "ARG") "1"))) ; SP = ARG + 1
-    (assign "@THAT" (dref (subtract-const (get-var "LCL") "1"))) ; THAT = *(frame-1)
-    (assign "@THIS" (dref (subtract-const (get-var "LCL") "2"))) ; THIS = *(frame-2)
-    (assign "@ARG" (dref (subtract-const (get-var "LCL") "3"))) ; ARG = *(frame-3)
-    (assign "@LCL" (dref (subtract-const (get-var "LCL") "4"))) ; LCL = *(frame-4)
-    (goto "@retAddr") ; goto retAddr
-    ]))
+   ["// NOTE: frame = LCL"
+    "// retAddr = *(frame-5)"
+    (assign "@retAddr" (dref (subtract-const (get-var "LCL") "5")))
+    "// *ARG = pop()"
+    (write-push-pop filename {:type :c-pop :a1 "argument" :a2 "0"})
+    "// SP = ARG + 1"
+    (assign "@SP" (dref (add-const (get-var "ARG") "1")))
+    "// THAT = *(frame-1)"
+    (assign "@THAT" (dref (subtract-const (get-var "LCL") "1")))
+    "// THIS = *(frame-2)"
+    (assign "@THIS" (dref (subtract-const (get-var "LCL") "2")))
+    "// ARG = *(frame-3)"
+    (assign "@ARG" (dref (subtract-const (get-var "LCL") "3")))
+    "// LCL = *(frame-4)"
+    (assign "@LCL" (dref (subtract-const (get-var "LCL") "4")))
+    "// goto retAddr"
+    (goto "@retAddr")]))
 
 (defn push-segment [segment] [(str "@" segment) "D=M" push-d])
 
