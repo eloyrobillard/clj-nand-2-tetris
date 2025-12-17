@@ -23,4 +23,3 @@ pom.xml.asc
 .lsp/
 *.asm
 *.hack
-*.vm
