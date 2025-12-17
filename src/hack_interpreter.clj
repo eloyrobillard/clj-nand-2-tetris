@@ -146,6 +146,7 @@
         rm-l-instr
         (interpret-aux sym-tbl state))))
 
-(let [file-input (with-open [rdr (clojure.java.io/reader (first *command-line-args*))]
-                   (into [] (line-seq rdr)))]
-  (spit "test.hack" (str/join "\n" (interpret file-input))))
+(defn -main []
+  (let [file-input (with-open [rdr (clojure.java.io/reader (first *command-line-args*))]
+                     (into [] (line-seq rdr)))]
+    (spit "test.hack" (str/join "\n" (interpret file-input)))))
