@@ -1,7 +1,10 @@
 (ns assembler.parser
   (:require [clojure.string :as str]))
 
-(defn is-a? [instr] (str/starts-with? (str/triml instr) "@"))
+(defn is-a? [instr]
+  {:pre [(some? instr)]}
+  (str/starts-with? (str/triml instr) "@"))
+
 (defn is-l? [instr]
   (str/starts-with?
    (str/triml instr) "("))
@@ -15,6 +18,7 @@
 ; (is-cmt? "  // sdf")
 
 (defn instruction-type [instr]
+  {:pre [(some? instr)]}
   (cond
     (is-a? instr) :a-instr
     (is-l? instr) :l-instr

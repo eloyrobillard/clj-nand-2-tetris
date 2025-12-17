@@ -100,7 +100,7 @@
     "D|A" (bit-or (:D state) (:A state))
     "D|M" (bit-or (:D state) (:M state))))
 
-(defn get-jmp-res [in cmp state]
+(defn get-jmp-res [in cmp]
   {:pre [(string? in)] :post [(boolean? %)]}
   (match in
     nil false
@@ -115,14 +115,14 @@
 (defn run-c [dest cmp jmp state]
   (let [d (get-dest dest)
         c (get-cmp-val cmp state)
-        j (get-jmp-res jmp c state)]
+        j (get-jmp-res jmp c)]
     (if (nil? d)
       (if (true? j)
         (assoc state :PC (:A state))
         state)
       (reduce (#(assoc %1 %2 c)) state d))))
 
-(reduce #(assoc %1 %2 5) {:x 1 :y 2} [:y])
+; (reduce #(assoc %1 %2 5) {:x 1 :y 2} [:y])
 
 (defn interpret-aux [seq st state]
   {:pre [(map? st)]
