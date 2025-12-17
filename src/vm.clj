@@ -33,6 +33,5 @@
     (let [lines (sanitize-lines (into [] (line-seq r)))]
       (run (sanitize-filename filename) "" 0 0 lines sp-setup))))
 
-(defn -main []
-  (let [filename (first *command-line-args*)]
-    (utils/print-seq (vm-to-asm filename))))
+(defn -main [filename]
+  (utils/print-seq (vm-to-asm filename)))
