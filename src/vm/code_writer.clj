@@ -3,40 +3,42 @@
   (:require [clojure.core.match :refer [match]]))
 
 (defn get-value-with-offset [base offset]
-  [base "D=M" (str/join ["@" offset]) "A=D+A"])
+  [(str "// get value with offset: [" base " + " offset "]") base "D=M" (str/join ["@" offset]) "A=D+A"])
 
 (defn get-address [filename segment offset]
   {:pre [(string? filename) (string? segment) (string? offset)]
    :post [(or (sequential? %) (string? %))]}
-  (match segment
-    "constant" (str/join ["@" offset])
-    "static" (str/join ["@" filename "." offset])
-    "local" (get-value-with-offset "@LCL" offset)
-    "argument" (get-value-with-offset "@ARG" offset)
-    "this" (get-value-with-offset "@THIS" offset)
-    "that" (get-value-with-offset "@THAT" offset)
-    "temp" (str/join ["@" (+ 5 (Integer/parseInt offset))])
-    "pointer" (if
-               (= offset "0")
-                "@THIS"
-                "@THAT")))
+  (flatten
+   [(str "get address: " segment " " offset)
+    (match segment
+      "constant" (str/join ["@" offset])
+      "static" (str/join ["@" filename "." offset])
+      "local" (get-value-with-offset "@LCL" offset)
+      "argument" (get-value-with-offset "@ARG" offset)
+      "this" (get-value-with-offset "@THIS" offset)
+      "that" (get-value-with-offset "@THAT" offset)
+      "temp" (str/join ["@" (+ 5 (Integer/parseInt offset))])
+      "pointer" (if
+                 (= offset "0")
+                  "@THIS"
+                  "@THAT"))]))
 
-(def push-d ["@SP" "A=M" "M=D" "@SP" "M=M+1"])
-(def pop-d ["@SP" "M=M-1" "A=M" "D=M"])
+(def push-d ["// push D to stack" "@SP" "A=M" "M=D" "@SP" "M=M+1"])
+(def pop-d ["// pop to D" "@SP" "M=M-1" "A=M" "D=M"])
 
 (defn push-constant [const]
   {:pre [(string? const)]}
   [(str "@" const) "D=A" push-d])
 
 (defn pop-direct-address [address]
-  (flatten [pop-d address "M=D"]))
+  (flatten [(str "// pop direct address: " address) pop-d address "M=D"]))
 
 (defn pop-temp [offset]
   {:pre [(int? offset)]}
   (flatten [pop-d (str "@" (+ offset 5)) "M=D"]))
 
 (defn pop-indirect-address [address]
-  (flatten [(pop-temp 0) address "D=A" "@6" "M=D" "@5" "D=M" "@6" "A=M" "M=D"]))
+  (flatten ["// pop indirect address" (pop-temp 0) address "D=A" "@6" "M=D" "@5" "D=M" "@6" "A=M" "M=D"]))
 
 (defn write-push-pop [filename op]
   (let [type (:type op)
@@ -95,7 +97,7 @@
 
 (defn write-function [op]
   {:pre [(some? (:a2 op))]}
-  (flatten [(str "(" (:a1 op) ")") (repeat (Integer/parseInt (:a2 op)) (push-constant "0"))]))
+  (flatten ["// write function" (str "(" (:a1 op) ")") (repeat (Integer/parseInt (:a2 op)) (push-constant "0"))]))
 
 (defn var-to-var [v1 v2]
   [(str "@" v1) "D=M" (str "@" v2) "M=D"])
