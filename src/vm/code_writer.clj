@@ -107,7 +107,7 @@
   (flatten [var (str "@" const) "D=D-A"]))
 
 (defn add-const [var const]
-  (flatten [var const "D=D+A"]))
+  (flatten [var (str "@" const) "D=D+A"]))
 
 (defn get-var [segment]
   [(str "@" segment) "D=M"])
