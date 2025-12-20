@@ -67,16 +67,17 @@
      (str/join ["(N" filename "." suffix "." (:ln op) ")"])]))
 
 (defn arithm [filename op]
-  (match (:a1 op)
-    "eq" (setup-boolean-op filename op)
-    "lt" (setup-boolean-op filename op)
-    "gt" (setup-boolean-op filename op)
-    "and" "D=D&M"
-    "or" "D=D|M"
-    "neg" "D=-D"
-    "not" "D=!D"
-    "add" "D=D+M"
-    "sub" "D=D-M"))
+  [(str "// arithmetic: " (:a1 op))
+   (match (:a1 op)
+     "eq" (setup-boolean-op filename op)
+     "lt" (setup-boolean-op filename op)
+     "gt" (setup-boolean-op filename op)
+     "and" "D=D&M"
+     "or" "D=D|M"
+     "neg" "D=-D"
+     "not" "D=!D"
+     "add" "D=D+M"
+     "sub" "D=D-M")])
 
 (defn write-arithmetic [filename op]
   (let [a1 (:a1 op)]
