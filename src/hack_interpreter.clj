@@ -124,6 +124,7 @@
 
 ; (reduce #(assoc %1 %2 5) {:x 1 :y 2} [:y])
 
+; TODO: このままじゃただASMを返すだけ
 (defn interpret-aux [seq st state]
   {:pre [(map? st)]
    :post [(every? string? %)]}

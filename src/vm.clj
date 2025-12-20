@@ -21,17 +21,22 @@
                     (str/starts-with? (str/triml %) "//"))
                   lines)))
 
-(def sp-setup ["// set SP up if not already done by testing script" "@SP" "D=M" "@SkipSPInit" "D;JNE" "@256" "D=A" "@SP" "M=D" "(SkipSPInit)" "// call Sys.init" "@Sys.init" "0;JMP"])
+; NOTE: Sys.init の存在を確認するときに使う @16 は
+; Sys.init が存在しない場合に引き継いでしまうアドレス
+(def sp-setup ["// set SP up if not already done by testing script" "@SP" "D=M" "@SkipSPInit" "D;JNE" "@256" "D=A" "@SP" "M=D" "(SkipSPInit)" "// call Sys.init if it exists" "@Sys.init" "D=A" "@16" "D=D-A" "@Sys.init" "D;JNE"])
 
 (defn sanitize-filename [filename]
   (-> filename
       (str/replace #"\..*" "")
       (str/replace #".+\/" "")))
 
-(defn vm-to-asm [filename]
+(defn vm-to-asm [filename lines]
+  (run filename "" 0 (count sp-setup) lines sp-setup))
+
+(defn vm-file-to-asm [filename]
   (with-open [r (clojure.java.io/reader filename)]
     (let [lines (sanitize-lines (into [] (line-seq r)))]
-      (run (sanitize-filename filename) "" 0 (count sp-setup) lines sp-setup))))
+      (vm-to-asm (sanitize-filename filename) lines))))
 
 (defn -main [filename]
-  (utils/print-seq (vm-to-asm filename)))
+  (utils/print-seq (vm-file-to-asm filename)))

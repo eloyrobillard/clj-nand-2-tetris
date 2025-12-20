@@ -4,11 +4,6 @@
             [vm.code-writer :as cw]
             [hack-interpreter :as itp]))
 
-; returns []
-; (vm/run "src/vm/test/SimpleAdd.vm" "" 0 0 [] [])
+(def fn-call-test ["function Foo 0" "call Bar 0" "return" "function Bar 0" "push constant 85" "return" "function Sys.init 0" "call Foo 0" "label LOOP" "goto LOOP"])
 
-(def in (vm/vm-to-asm "src/vm/test/SimpleAdd.vm"))
-
-(itp/rm-non-code in)
-(itp/interpret in)
-
+(itp/interpret (vm/vm-to-asm "Filename" fn-call-test))
