@@ -130,7 +130,7 @@
     "// *ARG = pop()"
     (write-push-pop filename {:type :c-pop :a1 "argument" :a2 "0"})
     "// SP = ARG + 1"
-    (assign "@SP" (dref (add-const (get-var "ARG") "1")))
+    (assign "@SP" (add-const (get-var "ARG") "1"))
     "// THAT = *(frame-1)"
     (assign "@THAT" (dref (subtract-const (get-var "LCL") "1")))
     "// THIS = *(frame-2)"
