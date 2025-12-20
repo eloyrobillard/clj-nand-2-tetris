@@ -101,8 +101,10 @@
   {:pre [(some? (:a2 op))]}
   (flatten ["// write function" (str "(" (:a1 op) ")") (repeat (Integer/parseInt (:a2 op)) (push-constant "0"))]))
 
-(defn var-to-var [v1 v2]
-  [(str "@" v1) "D=M" (str "@" v2) "M=D"])
+(defn var-to-var [vars]
+  (let [src (:src vars)
+        dest (:dest vars)]
+    [(str "@" src) "D=M" (str "@" dest) "M=D"]))
 
 (defn assign [r l]
   (flatten [l r "M=D"]))
@@ -150,16 +152,23 @@
         f (:a1 op)
         n-args (:a2 op)]
     (flatten
-     [(str "@" ret-addr) "D=A" push-d ; push retAddr
-      (push-segment "LCL") ; push LCL
-      (push-segment "ARG") ; push ARG
-      (push-segment "THIS") ; push THIS
-      (push-segment "THAT") ; push THAT
-      (var-to-var "ARG" "SP") (str "@" (+ 5 (Integer/parseInt n-args))) "D=A" "@ARG" "M=M-D" ; ARG = SP-5-nArgs
-      (var-to-var "SP" "LCL") ; LCL = SP
-      (str "@" f) "0;JMP" ; goto f
-      (str "(" ret-addr ")") ; (retAdr)
-      ])))
+     ["// push retAddr"
+      (str "@" ret-addr) "D=A" push-d
+      "// push LCL"
+      (push-segment "LCL")
+      "// push ARG"
+      (push-segment "ARG")
+      "// push THIS"
+      (push-segment "THIS")
+      "// push THAT"
+      (push-segment "THAT")
+      "// ARG = SP-5-nArgs"
+      (var-to-var {:src "SP" :dest "ARG"}) (str "@" (+ 5 (Integer/parseInt n-args))) "D=A" "@ARG" "M=M-D"
+      "// LCL = SP"
+      (var-to-var {:src "SP" :dest "LCL"})
+      "// goto f"
+      (str "@" f) "0;JMP"
+      (str "(" ret-addr ")")])))
 
 (defn write [filename fname call-num op]
   (let [type (:type op)]
