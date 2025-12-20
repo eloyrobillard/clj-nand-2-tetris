@@ -173,7 +173,11 @@
 (defn write [filename fname call-num op]
   (let [type (:type op)]
     {:fname (if (= :c-function type) (:a1 op) fname)
-     :call-num (if (= :c-call type) (+ call-num 1) call-num)
+     :call-num (match type
+                 :c-call (+ call-num 1)
+                 ; 関数ならcall-numは１にリセットしていい
+                 :c-function 1
+                 :else call-num)
      :asm (match type
             :c-function (write-function op)
             :c-return (write-return filename)
