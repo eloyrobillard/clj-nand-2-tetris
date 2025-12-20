@@ -126,6 +126,7 @@
   (flatten
    ["// NOTE: frame = LCL"
     "// retAddr = *(frame-5)"
+    ; NOTE: retAddr はリターンの中で即座に参照するので、上書きされる恐れはない
     (assign "@retAddr" (dref (subtract-const (get-var "LCL") "5")))
     "// *ARG = pop()"
     (write-push-pop filename {:type :c-pop :a1 "argument" :a2 "0"})
