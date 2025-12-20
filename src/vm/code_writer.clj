@@ -9,7 +9,7 @@
   {:pre [(string? filename) (string? segment) (string? offset)]
    :post [(or (sequential? %) (string? %))]}
   (flatten
-   [(str "get address: " segment " " offset)
+   [(str "// get address: " segment " " offset)
     (match segment
       "constant" (str/join ["@" offset])
       "static" (str/join ["@" filename "." offset])
@@ -55,7 +55,8 @@
 
 (defn setup-boolean-op [filename op]
   (let [suffix (str/upper-case (:a1 op))]
-    ["D=D-M"
+    ["// setup boolean operation"
+     "D=D-M"
      (str/join ["@" filename "." suffix "." (:ln op)])
      (str/join ["D;J" suffix])
      "D=0"
