@@ -2,6 +2,7 @@
   (:require [clojure.java.io :as io])
   (:require [clojure.string :as str])
   (:require [clojure.math :as math])
+  (:require [clojure.pprint :as pprint])
   (:require [clojure.core.match :refer [match]])
   (:require [assembler.symbol-table :as st])
   (:require [assembler.parser :as p]))
@@ -48,14 +49,11 @@
       (populate-st-l seq 0)
       (populate-st-a seq 16)))
 
-(defn set-reg [reg val state]
-  (assoc state reg val))
-
 (defn run-a [sym sym-tbl state]
   {:pre [(string? sym)]}
   (if (Character/isDigit (first sym))
-    (set-reg "A" (Integer/parseInt sym) state)
-    (set-reg "A" (sym-tbl sym) state)))
+    (assoc state :A (Integer/parseInt sym))
+    (assoc state :A (sym-tbl sym))))
 
 (defn get-dest [in]
   (match in
@@ -100,9 +98,9 @@
     "D|A" (bit-or (:D state) (:A state))
     "D|M" (bit-or (:D state) (:M state))))
 
-(defn get-jmp-res [in cmp]
-  {:pre [(string? in)] :post [(boolean? %)]}
-  (match in
+(defn get-jmp-res [jmp cmp]
+  {:pre [(or (nil? jmp) (string? jmp))] :post [(boolean? %)]}
+  (match jmp
     nil false
     "JGT" (> cmp 0)
     "JEQ" (= cmp 0)
@@ -120,22 +118,25 @@
       (if (true? j)
         (assoc state :PC (:A state))
         state)
-      (reduce (#(assoc %1 %2 c)) state d))))
+      (reduce #(assoc %1 %2 c) state d))))
 
-; (reduce #(assoc %1 %2 5) {:x 1 :y 2} [:y])
-
-; TODO: このままじゃただASMを返すだけ
 (defn interpret-aux [seq st state]
-  {:pre [(map? st)]
-   :post [(every? string? %)]}
-  (let [pc (:PC state)
-        instr (nth seq pc)
-        type (p/instruction-type instr)]
-    (if (= type :a-instr)
-      (let [sym (p/sym instr :a-instr)]
-        (run-a sym st state))
-      (run-c (p/dest instr) (p/cmp instr) (p/jump instr) state))
-    seq))
+  {:pre [(map? st)]}
+  (pprint/pprint state)
+  (if (constantly true)
+    (let [pc (:PC state)
+          instr (nth seq pc)
+          type (p/instruction-type instr)
+          new-state (assoc state :PC (+ 1 (:PC state)))]
+      (pprint/pprint instr)
+      (interpret-aux
+       seq
+       st
+       (if (= type :a-instr)
+         (let [sym (p/sym instr :a-instr)]
+           (run-a sym st new-state))
+         (run-c (p/dest instr) (p/cmp instr) (p/jump instr) new-state))))
+    state))
 
 (def st {"R0" 0, "R1" 1, "R2" 2, "R3" 3, "R4" 4, "R5" 5, "R6" 6, "R7" 7, "R8" 8, "R9" 9, "R10" 10, "R11" 11, "R12" 12, "R13" 13, "R14" 14, "R15" 15, "SP" 0, "LCL" 1, "ARG" 2, "THIS" 3, "THAT" 4, "SCREEN" 16384, "KBD" 24576})
 
