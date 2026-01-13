@@ -2,7 +2,6 @@
   (:require [clojure.java.io :as io])
   (:require [clojure.string :as str])
   (:require [clojure.math :as math])
-  (:require [clojure.pprint :as pprint])
   (:require [clojure.core.match :refer [match]])
   (:require [assembler.symbol-table :as st])
   (:require [assembler.parser :as p]))
@@ -12,10 +11,6 @@
 
 (defn rm-l-instr [seq]
   (filter #(not (= (p/instruction-type %) :l-instr)) seq))
-
-; (rm-non-code '())
-; (rm-non-code '("" "// sdf" "sdf" "// ewr" ""))
-; (rm-non-code '("@456" "@123" "" "// wer" "@echo" "D=0" "0;JMP"))
 
 (defn populate-st-l [st seq ln]
   {:pre [(map? st)]}
@@ -122,13 +117,12 @@
 
 (defn interpret-aux [seq st state]
   {:pre [(map? st)]}
-  (printf "PC: %d,\tA: %d,\tD: %d,\tM: %d\n" (:PC state) (:A state) (:D state) (:M state))
   (if (constantly true)
     (let [pc (:PC state)
           instr (nth seq pc)
           type (p/instruction-type instr)
           new-state (assoc state :PC (+ 1 (:PC state)))]
-      (pprint/pprint instr)
+      (println (format "P: %d,\tA: %d,\tD: %d,\tM: %d\t> %s" (:PC state) (:A state) (:D state) (:M state) instr))
       (interpret-aux
        seq
        st
