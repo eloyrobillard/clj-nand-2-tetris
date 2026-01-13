@@ -137,7 +137,7 @@
 (defn interpret [seq]
   (let [sq (rm-non-code seq)
         sym-tbl (populate-symbol-table sq st)
-        state {:A 0 :D 0 :M 0 :PC 0 :mem (take (+ (math/pow 2 24) 1))}]
+        state {:A 0 :D 0 :M 0 :PC 0 :mem (repeat (+ (math/pow 2 24) 1) 0)}]
     (-> sq
         rm-l-instr
         (interpret-aux sym-tbl state))))
