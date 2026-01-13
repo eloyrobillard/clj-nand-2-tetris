@@ -122,7 +122,7 @@
 
 (defn interpret-aux [seq st state]
   {:pre [(map? st)]}
-  (pprint/pprint state)
+  (printf "PC: %d,\tA: %d,\tD: %d,\tM: %d\n" (:PC state) (:A state) (:D state) (:M state))
   (if (constantly true)
     (let [pc (:PC state)
           instr (nth seq pc)
