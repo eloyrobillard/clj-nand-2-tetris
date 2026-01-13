@@ -105,6 +105,9 @@
     "JLE" (<= cmp 0)
     "JMP" true))
 
+(defn update-state [state keys val]
+  (reduce #(assoc %1 %2 val) state keys))
+
 (defn run-c [dest cmp jmp state]
   (let [d (get-dest dest)
         c (get-cmp-val cmp state)
@@ -113,7 +116,9 @@
       (if (true? j)
         (assoc state :PC (:A state))
         state)
-      (reduce #(assoc %1 %2 c) state d))))
+      (if (.contains d :M)
+        (update-state (assoc state :mem (assoc (:mem state) (:A state) c)) d c)
+        (update-state state d c)))))
 
 (defn interpret-aux [seq st state]
   {:pre [(map? st)]}
@@ -122,7 +127,7 @@
           instr (nth seq pc)
           type (p/instruction-type instr)
           new-state (assoc state :PC (+ 1 (:PC state)))]
-      (println (format "P: %d,\tA: %d,\tD: %d,\tM: %d\tRet: %d> %s" (:PC state) (:A state) (:D state) (:M state) (nth (:mem state) (st/get-address st "retAddr")) instr))
+      (println (format "P: %d,\tA: %d,\tD: %d,\tM: %d\tRet: %d\t> %s" (:PC state) (:A state) (:D state) (:M state) (nth (:mem state) (st/get-address st "retAddr")) instr))
       (interpret-aux
        seq
        st
@@ -137,7 +142,7 @@
 (defn interpret [seq]
   (let [sq (rm-non-code seq)
         sym-tbl (populate-symbol-table sq st)
-        state {:A 0 :D 0 :M 0 :PC 0 :mem (repeat (+ (math/pow 2 24) 1) 0)}]
+        state {:A 0 :D 0 :M 0 :PC 0 :mem (into [] (repeat (+ (math/pow 2 24) 1) 0))}]
     (-> sq
         rm-l-instr
         (interpret-aux sym-tbl state))))
