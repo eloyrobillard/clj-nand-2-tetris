@@ -122,7 +122,7 @@
           instr (nth seq pc)
           type (p/instruction-type instr)
           new-state (assoc state :PC (+ 1 (:PC state)))]
-      (println (format "P: %d,\tA: %d,\tD: %d,\tM: %d\t> %s" (:PC state) (:A state) (:D state) (:M state) instr))
+      (println (format "P: %d,\tA: %d,\tD: %d,\tM: %d\tRet: %d> %s" (:PC state) (:A state) (:D state) (:M state) (nth (:mem state) (st/get-address st "retAddr")) instr))
       (interpret-aux
        seq
        st
