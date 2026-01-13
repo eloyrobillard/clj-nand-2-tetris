@@ -143,7 +143,7 @@
     "// LCL = *(frame-4)"
     (assign "@LCL" (dref (subtract-const (get-var "LCL") "4")))
     "// goto retAddr"
-    (goto "@retAddr")]))
+    (goto (dref "@retAddr"))]))
 
 (defn push-segment [segment] [(str "@" segment) "D=M" push-d])
 
