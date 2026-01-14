@@ -46,9 +46,10 @@
 
 (defn run-a [sym sym-tbl state]
   {:pre [(string? sym)]}
-  (if (Character/isDigit (first sym))
-    (assoc state :A (Integer/parseInt sym))
-    (assoc state :A (sym-tbl sym))))
+  (let [new-state (if (Character/isDigit (first sym))
+                    (assoc state :A (Integer/parseInt sym))
+                    (assoc state :A (sym-tbl sym)))]
+    (assoc new-state :M (get (:mem new-state) (:A new-state)))))
 
 (defn get-dest [in]
   (match in
