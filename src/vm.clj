@@ -38,5 +38,6 @@
     (let [lines (sanitize-lines (into [] (line-seq r)))]
       (vm-to-asm (sanitize-filename filename) lines))))
 
-(defn -main [filename]
-  (utils/print-seq (vm-file-to-asm filename)))
+(defn -main [& filenames]
+  (doseq [filename filenames]
+    (utils/print-seq (vm-file-to-asm filename))))
