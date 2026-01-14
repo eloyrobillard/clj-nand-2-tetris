@@ -44,4 +44,5 @@
       (utils/print-seq (vm-file-to-asm filename))
       (let [files (.listFiles file)]
         (doseq [filename files]
-          (utils/print-seq (vm-file-to-asm filename)))))))
+          (when (str/includes? filename ".vm")
+            (utils/print-seq (vm-file-to-asm filename))))))))
