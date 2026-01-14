@@ -133,30 +133,30 @@
 
 (defn interpret-aux [seq st state]
   {:pre [(map? st)]}
-  (if (constantly true)
-    (let [pc (:PC state)
-          instr (nth seq pc)
-          type (p/instruction-type instr)
-          new-state (assoc state :PC (+ 1 (:PC state)))]
-      (println
-       (format "P: %d,\tA: %d,\tD: %d,\tM: %d,\tStk[%d]: %d,\tRet: %d\t> %s,\t\t%s"
-               (:PC state)
-               (:A state)
-               (:D state)
-               (:M state)
-               (nth (:mem state) (st/get-address st "SP"))
-               (nth (:mem state) (nth (:mem state) (st/get-address st "SP")))
-               (nth (:mem state) (st/get-address st "retAddr"))
-               instr
-               (get-stack-reading st state)))
-      (interpret-aux
-       seq
-       st
-       (if (= type :a-instr)
-         (let [sym (p/sym instr :a-instr)]
-           (run-a sym st new-state))
-         (run-c (p/dest instr) (p/cmp instr) (p/jump instr) new-state))))
-    state))
+  (let [pc (:PC state)
+        instr (nth seq pc)
+        type (p/instruction-type instr)
+        new-state (assoc state :PC (+ 1 (:PC state)))]
+    (if-not (str/includes? (nth seq (max 0 (- pc 1))) "Sys.init$LOOP")
+      ((println
+        (format "P: %d,\tA: %d,\tD: %d,\tM: %d,\tStk[%d]: %d,\tRet: %d\t> %s,\t\t%s"
+                (:PC state)
+                (:A state)
+                (:D state)
+                (:M state)
+                (nth (:mem state) (st/get-address st "SP"))
+                (nth (:mem state) (nth (:mem state) (st/get-address st "SP")))
+                (nth (:mem state) (st/get-address st "retAddr"))
+                instr
+                (get-stack-reading st state)))
+       (interpret-aux
+        seq
+        st
+        (if (= type :a-instr)
+          (let [sym (p/sym instr :a-instr)]
+            (run-a sym st new-state))
+          (run-c (p/dest instr) (p/cmp instr) (p/jump instr) new-state))))
+      state)))
 
 (def st {"R0" 0, "R1" 1, "R2" 2, "R3" 3, "R4" 4, "R5" 5, "R6" 6, "R7" 7, "R8" 8, "R9" 9, "R10" 10, "R11" 11, "R12" 12, "R13" 13, "R14" 14, "R15" 15, "SP" 0, "LCL" 1, "ARG" 2, "THIS" 3, "THAT" 4, "SCREEN" 16384, "KBD" 24576})
 
