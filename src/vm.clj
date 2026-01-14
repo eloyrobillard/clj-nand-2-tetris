@@ -30,19 +30,26 @@
       (str/replace #"\..*" "")
       (str/replace #".+\/" "")))
 
-(defn vm-to-asm [filename lines]
-  (run filename "" 0 (count sp-setup) lines sp-setup))
+(defn vm-to-asm [filename lines init-count]
+  (run filename "" 0 init-count lines []))
 
-(defn vm-file-to-asm [filename]
+(defn vm-file-to-asm [filename init-count]
+  {:pre [(string? filename)]}
   (with-open [r (io/reader filename)]
     (let [lines (sanitize-lines (into [] (line-seq r)))]
-      (vm-to-asm (sanitize-filename filename) lines))))
+      (vm-to-asm (sanitize-filename filename) lines init-count))))
+
+(defn vm-folder-to-asm [filenames init-count]
+  (when-not (empty? filenames)
+    (let [res (vm-file-to-asm (first filenames) init-count)
+          res-count (count res)]
+      (utils/print-seq res)
+      (vm-folder-to-asm (rest filenames) (+ init-count res-count)))))
 
 (defn -main [filename]
-  (let [file (io/file filename)]
-    (if-not (.isDirectory file)
-      (utils/print-seq (vm-file-to-asm filename))
-      (let [files (.listFiles file)]
-        (doseq [filename files]
-          (when (str/includes? filename ".vm")
-            (utils/print-seq (vm-file-to-asm filename))))))))
+  (utils/print-seq sp-setup)
+  (let [fileOrDir (io/file filename)
+        init-count (count sp-setup)]
+    (if-not (.isDirectory fileOrDir)
+      (utils/print-seq (vm-file-to-asm filename init-count))
+      (vm-folder-to-asm (map #(.getPath %1) (.listFiles fileOrDir)) init-count))))
