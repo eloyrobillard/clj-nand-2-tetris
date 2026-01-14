@@ -163,6 +163,7 @@
       "// push THAT"
       (push-segment "THAT")
       "// ARG = SP-5-nArgs"
+      "// （実質 ARG = SP; ARG -= 5 + nArgs）"
       (var-to-var {:src "SP" :dest "ARG"}) (str "@" (+ 5 (Integer/parseInt n-args))) "D=A" "@ARG" "M=M-D"
       "// LCL = SP"
       (var-to-var {:src "SP" :dest "LCL"})
