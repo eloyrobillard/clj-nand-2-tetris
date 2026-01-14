@@ -126,10 +126,10 @@
 
 (defn get-stack-reading [st state]
   (loop [i 257
-         result (str (get (:mem state) 256))]
-    (if (<= i (get (:mem state) (st/get-address st "SP")))
-      (recur (+ i 1) (str result "," (get (:mem state) i)))
-      result)))
+         result []]
+    (if (< i (get (:mem state) (st/get-address st "SP")))
+      (recur (+ i 1) (concat result [(str (get (:mem state) i))]))
+      (str/join "," result))))
 
 (defn interpret-aux [seq st state]
   {:pre [(map? st)]}
