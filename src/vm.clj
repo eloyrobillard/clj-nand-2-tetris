@@ -1,5 +1,5 @@
 (ns vm
-  (:require [clojure.java.io])
+  (:require [clojure.java.io :as io])
   (:require [clojure.string :as str])
   (:require [utils])
   (:require [vm.code-writer :as cw])
@@ -34,10 +34,14 @@
   (run filename "" 0 (count sp-setup) lines sp-setup))
 
 (defn vm-file-to-asm [filename]
-  (with-open [r (clojure.java.io/reader filename)]
+  (with-open [r (io/reader filename)]
     (let [lines (sanitize-lines (into [] (line-seq r)))]
       (vm-to-asm (sanitize-filename filename) lines))))
 
-(defn -main [& filenames]
-  (doseq [filename filenames]
-    (utils/print-seq (vm-file-to-asm filename))))
+(defn -main [filename]
+  (let [file (io/file filename)]
+    (if-not (.isDirectory file)
+      (utils/print-seq (vm-file-to-asm filename))
+      (let [files (.listFiles file)]
+        (doseq [filename files]
+          (utils/print-seq (vm-file-to-asm filename)))))))
