@@ -109,17 +109,20 @@
 (defn update-state [state keys val]
   (reduce #(assoc %1 %2 val) state keys))
 
-(defn run-c [dest cmp jmp state]
-  (let [d (get-dest dest)
-        c (get-cmp-val cmp state)
-        j (get-jmp-res jmp c)]
-    (if (nil? d)
-      (if (true? j)
+(defn run-c [d c j state]
+  (let [dest (get-dest d)
+        cmp (get-cmp-val c state)
+        jmp (get-jmp-res j cmp)]
+    (if (nil? dest)
+      (if (true? jmp)
         (assoc state :PC (:A state))
         state)
-      (if (.contains d :M)
-        (update-state (assoc state :mem (assoc (:mem state) (:A state) c)) d c)
-        (update-state state d c)))))
+      (if (.contains dest :M)
+        (update-state (assoc state :mem (assoc (:mem state) (:A state) cmp)) dest cmp)
+        (if (.contains dest :A)
+          (let [new-state (update-state state dest cmp)]
+            (assoc new-state :M (get (:mem new-state) (:A new-state))))
+          (update-state state dest cmp))))))
 
 (defn get-stack-reading [st state]
   (loop [i 257
