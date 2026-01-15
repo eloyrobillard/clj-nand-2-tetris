@@ -33,12 +33,12 @@
 (defn pop-direct-address [address]
   (flatten [(str "// pop direct address: " address) pop-d address "M=D"]))
 
-(defn pop-temp [offset]
+(defn pop-r13s [offset]
   {:pre [(int? offset)]}
-  (flatten [pop-d (str "@" (+ offset 5)) "M=D"]))
+  (flatten [pop-d (str "@R" (+ offset 13)) "M=D"]))
 
 (defn pop-indirect-address [address]
-  (flatten ["// pop indirect address" (pop-temp 0) address "D=A" "@6" "M=D" "@5" "D=M" "@6" "A=M" "M=D"]))
+  (flatten ["// pop indirect address" (pop-r13s 0) address "D=A" "@R14" "M=D" "@R13" "D=M" "@R14" "A=M" "M=D"]))
 
 (defn write-push-pop [filename op]
   (let [type (:type op)
@@ -83,7 +83,7 @@
   (let [a1 (:a1 op)]
     (if (or (= a1 "neg") (= a1 "not"))
       (flatten [pop-d (arithm filename op) push-d])
-      (flatten [pop-d "@5" "M=D" pop-d "@5" (arithm filename op) push-d]))))
+      (flatten [pop-d "@R13" "M=D" pop-d "@R13" (arithm filename op) push-d]))))
 
 (defn write-label [filename fname op]
   (let [label (:a1 op)]
