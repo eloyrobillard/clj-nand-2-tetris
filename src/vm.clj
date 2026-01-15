@@ -52,4 +52,4 @@
         init-count (count sp-setup)]
     (if-not (.isDirectory fileOrDir)
       (utils/print-seq (vm-file-to-asm filename init-count))
-      (vm-folder-to-asm (map #(.getPath %1) (.listFiles fileOrDir)) init-count))))
+      (vm-folder-to-asm (filter #(str/includes? %1 ".vm") (map #(.getPath %1) (.listFiles fileOrDir))) init-count))))
