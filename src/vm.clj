@@ -37,17 +37,28 @@
     (let [lines (sanitize-lines (into [] (line-seq r)))]
       (vm-to-asm (sanitize-filename filename) lines init-count))))
 
-(defn vm-folder-to-asm [filenames init-count]
-  (when-not (empty? filenames)
-    (let [res (vm-file-to-asm (first filenames) init-count)
-          res-count (count res)]
-      (utils/print-seq res)
-      (vm-folder-to-asm (rest filenames) (+ init-count res-count)))))
+(defn vm-folder-to-asm [filenames init-count result]
+  (if-not (empty? filenames)
+    (let [output (vm-file-to-asm (first filenames) init-count)
+          res-count (count output)]
+      (vm-folder-to-asm (rest filenames) (+ init-count res-count) (flatten [result output])))
+    result))
+
+(defn to-output-file [input-filename is-dir?]
+  (if-not is-dir?
+    (str/replace input-filename ".vm" ".asm")
+    (let [filename (last (str/split input-filename #"/"))
+          ends-with-slash (= (last input-filename) "/")]
+      (if ends-with-slash
+        (str input-filename filename ".asm")
+        (str input-filename "/" filename ".asm")))))
 
 (defn -main [filename]
-  (utils/print-seq sp-setup)
-  (let [fileOrDir (io/file filename)
-        init-count (count sp-setup)]
-    (if-not (.isDirectory fileOrDir)
-      (utils/print-seq (vm-file-to-asm filename init-count))
-      (vm-folder-to-asm (filter #(str/includes? %1 ".vm") (map #(.getPath %1) (.listFiles fileOrDir))) init-count))))
+  (let [file-or-dir (io/file filename)
+        init-count (count sp-setup)
+        is-dir? (.isDirectory file-or-dir)
+        output-filepath (to-output-file filename is-dir?)
+        result (if-not (.isDirectory file-or-dir)
+                 (flatten [sp-setup (vm-file-to-asm filename init-count)])
+                 (vm-folder-to-asm (filter #(str/includes? %1 ".vm") (map #(.getPath %1) (.listFiles file-or-dir))) init-count sp-setup))]
+    (spit output-filepath (str/join "\n" result))))
