@@ -21,9 +21,7 @@
                     (str/starts-with? (str/triml %) "//"))
                   lines)))
 
-; NOTE: Sys.init の存在を確認するときに使う @16 は
-; Sys.init が存在しない場合に引き継いでしまうアドレス
-(def sp-setup ["// set SP up if not already done by testing script" "@SP" "D=M" "@SkipSPInit" "D;JNE" "@256" "D=A" "@SP" "M=D" "(SkipSPInit)" "// call Sys.init if it exists" "@Sys.init" "D=A" "@16" "D=D-A" "@Sys.init" "D;JNE"])
+(def sp-setup ["// set SP to 256" "@256" "D=A" "@SP" "M=D" "// call Sys.init if it exists" "@Sys.init" "D=A" "@16" "D=D-A" "@SkipSysInit" "D;JEQ" "// push retAddr" "@Foo$ret.1" "D=A" "// push D" "@SP" "A=M" "M=D" "@SP" "M=M+1" "// push LCL" "@LCL" "D=M" "// push D" "@SP" "A=M" "M=D" "@SP" "M=M+1" "// push ARG" "@ARG" "D=M" "// push D" "@SP" "A=M" "M=D" "@SP" "M=M+1" "// push THIS" "@THIS" "D=M" "// push D" "@SP" "A=M" "M=D" "@SP" "M=M+1" "// push THAT" "@THAT" "D=M" "// push D" "@SP" "A=M" "M=D" "@SP" "M=M+1" "// ARG = SP-5-nArgs" "// （実質 ARG = SP; ARG -= 5 + nArgs）" "@SP" "D=M" "@ARG" "M=D" "@5" "D=A" "@ARG" "M=M-D" "// LCL = SP" "@SP" "D=M" "@LCL" "M=D" "// goto Sys.init" "@Sys.init" "0;JMP" "(Foo$ret.1)" "(SkipSysInit)"])
 
 (defn sanitize-filename [filename]
   (-> filename
