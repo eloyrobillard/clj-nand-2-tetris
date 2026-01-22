@@ -3,7 +3,8 @@
   (:require [clojure.string :as str])
   (:require [utils])
   (:require [vm.code-writer :as cw])
-  (:require [vm.parser :as p]))
+  (:require [vm.parser :as p])
+  (:gen-class))
 
 (defn run [filename funcname call-num line-num lines result]
   (if (nil? (first lines))
